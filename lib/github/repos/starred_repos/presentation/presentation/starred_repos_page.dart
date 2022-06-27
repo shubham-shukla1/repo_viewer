@@ -4,7 +4,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:repo_viewer/auth/shared/providers.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
 
-import 'paginated_repos_list_view.dart';
+import '../../../core/presentation/paginated_repos_list_view.dart';
 
 class StarredReposPage extends ConsumerStatefulWidget {
   const StarredReposPage({Key? key}) : super(key: key);
@@ -44,7 +44,13 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
               icon: const Icon(MdiIcons.loginVariant))
         ],
       ),
-      body: const PaginatedReposListView(),
+      body: PaginatedReposListView(
+        paginatedReposNotifierProvider: starredReposNotifierProvider,
+        getNextPage: (ref) => ref
+            .read(starredReposNotifierProvider.notifier)
+            .getNextStarredReposPage(),
+            noResultMessage:  "Thats about everything we could find for right now",
+      ),
     );
   }
 }
