@@ -25,14 +25,14 @@ class StarredReposRemoteService {
     //comment these hardcoded token and header , coz token is added in the auth interceptor
     //and accept header is added in base option
     // final acceptHeader = 'application/vnd.github.v3.html+json';
-    final requestUri =  Uri.https(
-          'api.github.com',
-          '/user/starred',
-          {
-            'page': '$page',
-            'per_page': PaginationConfig.itemsPerPage.toString(),
-          },
-     ) ;
+    final requestUri = Uri.https(
+      'api.github.com',
+      '/user/starred',
+      {
+        'page': '$page',
+        'per_page': PaginationConfig.itemsPerPage.toString(),
+      },
+    );
     //headers come from previous response
     final previousHeaders = await _githubHeadersCache.getHeaders(requestUri);
 
@@ -40,7 +40,7 @@ class StarredReposRemoteService {
       final response = await _dio.getUri(requestUri,
           options: Options(headers: {
             //comment these hardcoded token and header , coz token is added in the auth interceptor
-            //and accept header is added in base option , centralized way to add all headers 
+            //and accept header is added in base option , centralized way to add all headers
             // 'Authorization': 'bearer $token',
             // 'Accept': acceptHeader,
             'If-None-Match': previousHeaders?.eTag ?? ""
@@ -68,8 +68,7 @@ class StarredReposRemoteService {
       if (e.isNoConnectionError) {
         //no connection we are always going to show the cached data
         //if no previousHeaders then maxPage will be zero
-        return RemoteResponse.noConnection(
-            maxPage: previousHeaders?.link?.maxPage ?? 0);
+        return const RemoteResponse.noConnection();
       } else if (e.response != null) {
         //not all dio error comes from Dio thats why response , make nullable like Connection Error which is not from dio but device
 

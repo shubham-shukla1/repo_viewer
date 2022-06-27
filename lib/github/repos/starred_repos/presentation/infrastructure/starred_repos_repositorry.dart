@@ -20,10 +20,10 @@ class StarredReposRepository {
       return right(await remotePageItems.when(
           // in case of no connection always load data from local cache,no connection dat is not fresh
           //we get max page from no connection
-          noConnection: ((maxPage) async => Fresh.no(
+          noConnection: (() async => Fresh.no(
               //await something inside of nested function?
               await _localService.getPage(page).then((_) => _.toDomain()),
-              isNextPageAvailable: page < maxPage)),
+              isNextPageAvailable: page < await _localService.getLocalPageCount())),
           //in not modified we have got 304 code ,
           notModified: ((maxPage) async => Fresh.yes(
               await _localService.getPage(page).then((_) => _.toDomain()),
