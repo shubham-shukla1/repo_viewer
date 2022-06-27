@@ -3,6 +3,7 @@ import 'package:repo_viewer/core/domain/fresh.dart';
 import 'package:repo_viewer/core/infrastrcture/networ_exception.dart';
 import 'package:repo_viewer/github/core/domain/github_failure.dart';
 import 'package:repo_viewer/github/core/domain/github_repo.dart';
+import 'package:repo_viewer/github/repos/core/infrastructure/extension.dart';
 import 'package:repo_viewer/github/repos/starred_repos/presentation/infrastructure/starred_repos_local_service.dart';
 import 'package:repo_viewer/github/repos/starred_repos/presentation/infrastructure/starred_repos_remote_service.dart';
 
@@ -41,8 +42,5 @@ class StarredReposRepository {
   }
 }
 
-extension DTOListTODomainList on List<GithubRepoDTO> {
-  List<GithubRepo> toDomain() {
-    return map((e) => e.toDomain()).toList();
-  }
-}
+
+
