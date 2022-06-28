@@ -33,7 +33,10 @@ final starredReposRepositoryProvider = Provider(
   ),
 );
 
-final starredReposNotifierProvider = StateNotifierProvider<
+//signout from the app,and come back starred repos  are freshly gotten ,coz without auto
+//dispose modifier, after sign out, login with another account we will still see the previous repos
+
+final starredReposNotifierProvider = StateNotifierProvider.autoDispose<
     StarredReposNotifier, PaginatedReposState>(
   (ref) => StarredReposNotifier(ref.watch(starredReposRepositoryProvider)),
 );
@@ -52,8 +55,11 @@ final searchedReposRepositoryProvider = Provider(
     ref.watch(searchedReposRemoteServiceProvider),
   ),
 );
-
-final searchedReposNotifierProvider = StateNotifierProvider<
+//By default riverpod provider hold the instance which they create it in memory
+//until the app is fully closed
+//previously results were hold, by default object provided by riverpod are not disposed
+ //when they are not in use then auto dispose,once we are away from that page
+final searchedReposNotifierProvider = StateNotifierProvider.autoDispose<
     SearchedReposNotifier, PaginatedReposState>(
   (ref) => SearchedReposNotifier(ref.watch(searchedReposRepositoryProvider)),
 );
