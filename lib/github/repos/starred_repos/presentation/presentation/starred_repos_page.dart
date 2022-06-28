@@ -1,9 +1,13 @@
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:repo_viewer/auth/shared/providers.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
+import 'package:repo_viewer/github/repos/searched_repos/presentation/searched_repos_page.dart';
 
+import '../../../../../core/presentation/routes/app_router.gr.dart';
 import '../../../core/presentation/paginated_repos_list_view.dart';
 
 class StarredReposPage extends ConsumerStatefulWidget {
@@ -41,7 +45,12 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
               onPressed: () {
                 ref.read(authNotifierProvider.notifier).signOut();
               },
-              icon: const Icon(MdiIcons.loginVariant))
+              icon: const Icon(MdiIcons.logoutVariant)),
+          IconButton(
+              onPressed: () {
+                AutoRouter.of(context).push(SearchedReposRoute(searchTerm: 'flutter'));
+              },
+              icon: const Icon(MdiIcons.magnify))
         ],
       ),
       body: PaginatedReposListView(
@@ -49,7 +58,7 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
         getNextPage: (ref) => ref
             .read(starredReposNotifierProvider.notifier)
             .getNextStarredReposPage(),
-            noResultMessage:  "Thats about everything we could find for right now",
+        noResultMessage: "Thats about everything we could find for right now",
       ),
     );
   }
