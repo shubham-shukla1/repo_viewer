@@ -38,7 +38,60 @@ class SearchHistoryRepository {
                 : null)
         .onSnapshots(_sembastDatabase.instance)
         .map(
-          (records) => records.map((e) => e.value).toList(),
+          (records) => records.reversed.map((e) => e.value).toList(),
         );
+  }
+
+//Not exposing the private methods, details will be in private methods so don not worry about the implementation when accessing
+
+  Future<void> addSearchTerms(String term) =>
+      _addSearchTerms(term, _sembastDatabase.instance);
+
+  Future<void> deleteSearchTerms(String term) =>
+      _deleteSearchTerms(term, _sembastDatabase.instance);
+
+  Future<void> putSearchTermFirst(String term) async {
+    //whenever doing these kind of multiple database operations
+    //very close to each optimize using db transaction
+    await _sembastDatabase.instance.transaction((transaction) async {
+      await _deleteSearchTerms(term, transaction);
+      await _addSearchTerms(term, transaction);
+    });
+  }
+
+//whenever calling add search terms, should check if it is already exist in history ,
+//do not add it
+
+  Future<void> _addSearchTerms(
+      String term, DatabaseClient databaseClient) async {
+    final existingKey = await _store.findKey(
+      databaseClient,
+      finder: Finder(
+        filter: Filter.custom(
+          ((record) => record.value == term),
+        ),
+      ),
+    );
+    if (existingKey != null) {
+      putSearchTermFirst(term);
+      return;
+    }
+
+    await _store.add(databaseClient, term);
+    final count = await _store.count(_sembastDatabase.instance);
+    if (count > historyLength) {
+      await _store.delete(
+        _sembastDatabase.instance,
+        finder: Finder(limit: count - historyLength),
+      );
+    }
+  }
+
+  Future<void> _deleteSearchTerms(
+      String term, DatabaseClient databaseClient) async {
+    await _store.delete(databaseClient,
+        finder: Finder(
+          filter: Filter.custom((record) => record.value == term),
+        ));
   }
 }
