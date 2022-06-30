@@ -105,43 +105,42 @@ class _PaginatedListView extends StatelessWidget {
     return
 
         //no app bar so we have to include safe area widget  , so that it s not inside notches etc
-        SafeArea(
-      child: ListView.builder(
-        //floatingSearchBar is not const so padding wont be const
-        padding: floatingSearchBar == null
-            ? EdgeInsets.zero
-            : EdgeInsets.only(top: floatingSearchBar.height +8),
-        itemCount: state.map(
-          initial: (_) => 0,
-          loadInProgress: (_) => _.repos.entity.length + _.itemsPerPage,
-          loadSuccess: (_) => _.repos.entity.length,
-          loadFailure: (_) =>
+        //for list in the notches but with padding we include media query padding
+        ListView.builder(
+          //floatingSearchBar is not const so padding wont be const
+          padding: floatingSearchBar == null
+              ? EdgeInsets.zero
+              : EdgeInsets.only(top: floatingSearchBar.height +8 +MediaQuery.of(context).padding.top),
+          itemCount: state.map(
+            initial: (_) => 0,
+            loadInProgress: (_) => _.repos.entity.length + _.itemsPerPage,
+            loadSuccess: (_) => _.repos.entity.length,
+            loadFailure: (_) =>
 
-              //if failure occurs we want to load the previous list
-              _.repos.entity.length + 1,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          return state.map(
-              initial: (_) => Container(),
-              loadInProgress: (_) {
-                if (index < _.repos.entity.length) {
-                  return RepoTile(repo: _.repos.entity[index]);
-                } else {
-                  //when load in progress we are going to show shimmer,
-                  // instead of text or images for some time
-                  return const LoadingRepoTile();
-                }
-              },
-              loadSuccess: (_) => RepoTile(repo: _.repos.entity[index]),
-              loadFailure: (_) {
-                if (index < _.repos.entity.length) {
-                  return RepoTile(repo: _.repos.entity[index]);
-                } else {
-                  return FailureRepoTile(failure: _.failure);
-                }
-              });
-        },
-      ),
-    );
+                //if failure occurs we want to load the previous list
+                _.repos.entity.length + 1,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return state.map(
+                initial: (_) => Container(),
+                loadInProgress: (_) {
+                  if (index < _.repos.entity.length) {
+                    return RepoTile(repo: _.repos.entity[index]);
+                  } else {
+                    //when load in progress we are going to show shimmer,
+                    // instead of text or images for some time
+                    return const LoadingRepoTile();
+                  }
+                },
+                loadSuccess: (_) => RepoTile(repo: _.repos.entity[index]),
+                loadFailure: (_) {
+                  if (index < _.repos.entity.length) {
+                    return RepoTile(repo: _.repos.entity[index]);
+                  } else {
+                    return FailureRepoTile(failure: _.failure);
+                  }
+                });
+          },
+        );
   }
 }

@@ -26,17 +26,34 @@ class SearchBar extends ConsumerStatefulWidget {
 class _SearchBarState extends ConsumerState<SearchBar> {
   @override
   void initState() {
-    ref.read(searchHistoryNotifierProvider.notifier).watchSearchTerms(); 
+    ref.read(searchHistoryNotifierProvider.notifier).watchSearchTerms();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return FloatingSearchBar(
-      body: widget.body,
-      title: Text(widget.title),
+      //in which the search bar is hidden
+      /// when the user scrolls down and shown again when the user scrolls up
+      //it also have the return widget scroll notification
+
+      body: FloatingSearchBarScrollNotifier(child: widget.body),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        //column take up only necessary amount not full height using size
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            widget.title,
+            style: Theme.of(context).textTheme.headline6,
+          ),
+
+          //for emoji: on mac control alt space and on windows windows dot
+          Text('Tap to search 👆', style: Theme.of(context).textTheme.caption),
+        ],
+      ),
       hint: widget.hint,
-      builder: (context,transition) {
+      builder: (context, transition) {
         return Container();
       },
     );
