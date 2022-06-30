@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:material_floating_search_bar/material_floating_search_bar.dart';
 import 'package:repo_viewer/core/presentation/toast.dart';
 import 'package:repo_viewer/github/core/presentation/no_results_display.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
@@ -10,8 +11,8 @@ import 'package:repo_viewer/github/repos/core/presentation/repo_tile.dart';
 import 'loading_repo_tile.dart';
 
 class PaginatedReposListView extends ConsumerStatefulWidget {
-  final AutoDisposeStateNotifierProvider<PaginatedReposNotifier, PaginatedReposState>
-      paginatedReposNotifierProvider;
+  final AutoDisposeStateNotifierProvider<PaginatedReposNotifier,
+      PaginatedReposState> paginatedReposNotifierProvider;
 
   final void Function(WidgetRef ref) getNextPage;
 
@@ -81,9 +82,7 @@ class _PaginatedReposListViewState
           orElse: () => false,
           loadSuccess: (repos, _) => repos.entity.isEmpty,
         )
-                ?  NoResultsDisplay(
-                    message:
-                       widget.noResultMessage)
+                ? NoResultsDisplay(message: widget.noResultMessage)
                 : _PaginatedListView(state: state));
   }
 }
@@ -99,37 +98,50 @@ class _PaginatedListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: state.map(
-        initial: (_) => 0,
-        loadInProgress: (_) => _.repos.entity.length + _.itemsPerPage,
-        loadSuccess: (_) => _.repos.entity.length,
-        loadFailure: (_) =>
+    //Returns the nearest ancestor widget of the given type T, which must be the type of a concrete [Widget] subclass.
+    //we can access by default by this method
+    // context.findAncestorStateOfType<FloatingSearchBar>()?.height;
+    final floatingSearchBar = FloatingSearchBar.of(context)?.widget;
+    return
 
-            //if failure occurs we want to load the previous list
-            _.repos.entity.length + 1,
+        //no app bar so we have to include safe area widget  , so that it s not inside notches etc
+        SafeArea(
+      child: ListView.builder(
+        //floatingSearchBar is not const so padding wont be const
+        padding: floatingSearchBar == null
+            ? EdgeInsets.zero
+            : EdgeInsets.only(top: floatingSearchBar.height +8),
+        itemCount: state.map(
+          initial: (_) => 0,
+          loadInProgress: (_) => _.repos.entity.length + _.itemsPerPage,
+          loadSuccess: (_) => _.repos.entity.length,
+          loadFailure: (_) =>
+
+              //if failure occurs we want to load the previous list
+              _.repos.entity.length + 1,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return state.map(
+              initial: (_) => Container(),
+              loadInProgress: (_) {
+                if (index < _.repos.entity.length) {
+                  return RepoTile(repo: _.repos.entity[index]);
+                } else {
+                  //when load in progress we are going to show shimmer,
+                  // instead of text or images for some time
+                  return const LoadingRepoTile();
+                }
+              },
+              loadSuccess: (_) => RepoTile(repo: _.repos.entity[index]),
+              loadFailure: (_) {
+                if (index < _.repos.entity.length) {
+                  return RepoTile(repo: _.repos.entity[index]);
+                } else {
+                  return FailureRepoTile(failure: _.failure);
+                }
+              });
+        },
       ),
-      itemBuilder: (BuildContext context, int index) {
-        return state.map(
-            initial: (_) => Container(),
-            loadInProgress: (_) {
-              if (index < _.repos.entity.length) {
-                return RepoTile(repo: _.repos.entity[index]);
-              } else {
-                //when load in progress we are going to show shimmer,
-                // instead of text or images for some time
-                return const LoadingRepoTile();
-              }
-            },
-            loadSuccess: (_) => RepoTile(repo: _.repos.entity[index]),
-            loadFailure: (_) {
-              if (index < _.repos.entity.length) {
-                return RepoTile(repo: _.repos.entity[index]);
-              } else {
-                return FailureRepoTile(failure: _.failure);
-              }
-            });
-      },
     );
   }
 }
