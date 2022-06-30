@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:repo_viewer/github/core/domain/github_failure.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
+import 'package:repo_viewer/github/repos/core/presentation/paginated_repos_list_view.dart';
 
 class FailureRepoTile extends ConsumerWidget {
   final GithubFailure failure;
@@ -35,9 +36,12 @@ class FailureRepoTile extends ConsumerWidget {
           trailing: IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () {
-              ref
-                  .read(starredReposNotifierProvider.notifier)
-                  .getNextStarredReposPage();
+              context
+                  .findAncestorWidgetOfExactType<PaginatedReposListView>()
+                  ?.getNextPage(ref);
+              // ref
+              //     .read(starredReposNotifierProvider.notifier)
+              //     .getNextStarredReposPage();
             },
           ),
         ),
