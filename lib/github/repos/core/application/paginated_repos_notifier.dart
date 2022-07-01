@@ -48,14 +48,23 @@ class PaginatedReposNotifier extends StateNotifier<PaginatedReposState> {
             Fresh.yes([]),
           ),
         );
+
   //sometimes mutable field using directly in class is fine
   int _page = 1;
-  
+
+  @protected
+  void resetState() {
+    _page = 1;
+    state = PaginatedReposState.initial(Fresh.yes([]));
+  }
+
 //it should be only called from the subclasses,by mark it as protected which comes from meta package
   @protected
   Future<void> getNextPage(RepositoryGetter getter) async {
     state = PaginatedReposState.loadInProgress(
-        state.repos, PaginationConfig.itemsPerPage);
+      state.repos,
+      PaginationConfig.itemsPerPage,
+    );
     final failureOrRepos = await getter(_page);
     state = failureOrRepos.fold(
       //not increment the page unless successful

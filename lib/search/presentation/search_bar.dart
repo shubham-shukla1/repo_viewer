@@ -127,7 +127,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
       },
       //onSubmitted Callback will run whenever the query is submitted
       onSubmitted: (query) {
-        widget.onShouldNavigateToResultPage(query);
+       pushPageAndAddToHistory(query);
       },
       builder: (context, transition) {
         final searchHistoryState = ref.watch(searchHistoryNotifierProvider);
