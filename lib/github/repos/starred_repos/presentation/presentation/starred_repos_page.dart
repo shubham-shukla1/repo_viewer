@@ -26,11 +26,7 @@ class _StarredReposPageState extends ConsumerState<StarredReposPage> {
     //wait a bit to read the notifier,schedule the call to happen in future
     //but not to much as soon as possible after init state has run successfully
     //scheduling the call using microtask
-    Future.microtask(
-      () => ref
-          .read(starredReposNotifierProvider.notifier)
-          .getNextStarredReposPage(),
-    );
+    ref.read(starredReposNotifierProvider.notifier).getNextStarredReposPage();
 //Other ways
     // WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {ref.read(provider)});
 

@@ -1,9 +1,11 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:repo_viewer/auth/shared/providers.dart';
 import 'package:repo_viewer/github/core/shared/providers.dart';
+import 'package:repo_viewer/search/presentation/search_bar.dart';
 
+import '../../../../core/presentation/routes/app_router.gr.dart';
 import '../../core/presentation/paginated_repos_list_view.dart';
 
 class SearchedReposPage extends ConsumerStatefulWidget {
@@ -25,25 +27,32 @@ class _SearchedReposPageState extends ConsumerState<SearchedReposPage> {
     super.initState();
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title:  Text(widget.searchTerm),
-        actions: [
-          IconButton(
-              onPressed: () {
-                ref.read(authNotifierProvider.notifier).signOut();
-              },
-              icon: const Icon(MdiIcons.loginVariant))
-        ],
-      ),
-      body: PaginatedReposListView(
-        paginatedReposNotifierProvider: searchedReposNotifierProvider,
-        getNextPage: (ref) => ref
-            .read(searchedReposNotifierProvider.notifier)
-            .getNextSearchedReposPage(widget.searchTerm),
-            noResultMessage:  "This is all we could find for search Term",
+     
+      body: SearchBar(
+        title: widget.searchTerm,
+        hint: 'Search all repositories...',
+        onShouldNavigateToResultPage: (searchTerm) {
+          //when call replace the page is same as replacement page then new instance of this page is not really created
+          //init state will not run again, we need to first pop
+          AutoRouter.of(context).pushAndPopUntil(
+            SearchedReposRoute(searchTerm: searchTerm),
+            predicate: (route) => route.settings.name == StarredReposRoute.name,
+            // predicate: (Route<dynamic> route) => false,this will pop all of routes ,we only want to pop until
+          );
+        },
+        onSignOutButtonPressed: () {
+          ref.read(authNotifierProvider.notifier).signOut();
+        },
+        body: PaginatedReposListView(
+          paginatedReposNotifierProvider: searchedReposNotifierProvider,
+          getNextPage: (ref) => ref
+              .read(searchedReposNotifierProvider.notifier)
+              .getNextSearchedReposPage(widget.searchTerm),
+          noResultMessage: "This is all we could find for search Term",
+        ),
       ),
     );
   }
