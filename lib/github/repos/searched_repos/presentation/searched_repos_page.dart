@@ -30,7 +30,6 @@ class _SearchedReposPageState extends ConsumerState<SearchedReposPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: SearchBar(
         title: widget.searchTerm,
         hint: 'Search all repositories...',

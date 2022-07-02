@@ -87,6 +87,7 @@ class _SearchBarState extends ConsumerState<SearchBar> {
         ],
       ),
       hint: widget.hint,
+      automaticallyImplyBackButton: false,
       leadingActions: [
         if (AutoRouter.of(context).canPopSelfOrChildren &&
             (Platform.isIOS || Platform.isMacOS))

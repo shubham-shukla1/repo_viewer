@@ -42,7 +42,7 @@ class _PaginatedReposListViewState
     final state = ref.watch(widget.paginatedReposNotifierProvider);
     ref.listen<PaginatedReposState>(widget.paginatedReposNotifierProvider,
         (previous, next) {
-      next.map(
+      state.map(
         initial: (_) => canLoadNextPage = true,
         //we do not need to load the next page if apge is already in loading
         loadInProgress: (_) => canLoadNextPage = false,
